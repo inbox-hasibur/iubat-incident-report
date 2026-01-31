@@ -8,7 +8,13 @@ export async function createIncident(formData: FormData) {
   try {
     await connectToDatabase();
 
-    // Extract data from the form
+    // Multiple Links handle kora
+    // Form theke amra "evidenceLinks" name-e string pabo (comma separated thakte pare)
+    const linksString = formData.get("evidenceLinks") as string;
+    const evidenceLinks = linksString 
+      ? linksString.split(",").map((link) => link.trim()).filter((link) => link.length > 0)
+      : [];
+
     const rawData = {
       title: formData.get("title"),
       type: formData.get("type"),
@@ -17,17 +23,24 @@ export async function createIncident(formData: FormData) {
       time: formData.get("time"),
       location: formData.get("location"),
       reportedPerson: formData.get("reportedPerson"),
+      
+      // Witnesses
       witnesses: [formData.get("witness1"), formData.get("witness2")],
-      evidenceLink: formData.get("evidenceLink"),
+      
+      // New: Multiple Links
+      evidenceLinks: evidenceLinks,
+
+      // New: Images (URLs from Cloudinary)
+      victimImage: formData.get("victimImage"),
+      itemImage: formData.get("itemImage"),
+      accusedImage: formData.get("accusedImage"),
     };
 
-    // Save to MongoDB
     const newIncident = await Incident.create(rawData);
 
-    // Refresh the page data
     revalidatePath("/");
     
-    return { success: true, message: "Report filed successfully!" };
+    return { success: true, message: "Red Flag filed successfully!" };
   } catch (error: any) {
     console.error("Database Error:", error);
     return { success: false, message: error.message || "Failed to submit report" };

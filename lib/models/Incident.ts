@@ -13,15 +13,25 @@ const IncidentSchema = new Schema(
     time: { type: String, required: true },
     location: { type: String, required: true },
     reportedPerson: { type: String },
+    
+    // Witnesses
     witnesses: {
       type: [String],
       required: true,
     },
-    evidenceLink: { type: String },
-    // NEW FIELDS FOR IMAGES
+
+    // OLD: evidenceLink: { type: String }
+    // NEW: Multiple Links support
+    evidenceLinks: { 
+      type: [String], 
+      default: [] 
+    },
+
+    // CLOUDINARY IMAGES (Images/PDFs ONLY)
     victimImage: { type: String },
     itemImage: { type: String },
     accusedImage: { type: String },
+
     status: {
       type: String,
       default: "unverified",
