@@ -1,53 +1,78 @@
 import Link from "next/link";
+import connectToDatabase from "@/lib/db";
+import Incident from "@/lib/models/Incident";
+import IncidentCard from "@/components/shared/incident-card";
 
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams: any }) {
+  await connectToDatabase();
+  
+  // URL theke filter type neya (e.g. ?type=theft)
+  const typeFilter = (await searchParams).type;
+  
+  // Filter logic: type thakle filter korbe, na thakle sob dekhabe
+  const query = typeFilter ? { type: typeFilter } : {};
+  const incidents = await Incident.find(query).sort({ createdAt: -1 });
+
+  const categories = [
+    { label: "All", value: "" },
+    { label: "Theft", value: "theft" },
+    { label: "Scam", value: "scam" },
+    { label: "Harassment", value: "harassment" },
+  ];
+
   return (
-    <main className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6 py-12 text-center">
-      {/* Alert Badge */}
-      <div className="mb-6 rounded-full bg-red-100 px-4 py-1.5 text-xs font-bold tracking-widest text-red-600 uppercase">
-        Campus Safety Alert
+    <main className="container mx-auto px-6 py-12">
+      {/* Hero Section */}
+      <section className="mb-20 flex flex-col items-center text-center">
+        <h1 className="max-w-3xl text-5xl font-black tracking-tighter text-gray-900 md:text-7xl italic uppercase">
+          IUBAT <span className="text-red-600">Red Flags</span>
+        </h1>
+        <p className="mt-6 max-w-xl text-lg text-gray-600">
+          A community-driven awareness platform to report and track unethical activities.
+        </p>
+      </section>
+
+      {/* Category Filters */}
+      <div className="mb-10 flex flex-wrap justify-center gap-3">
+        {categories.map((cat) => (
+          <Link
+            key={cat.label}
+            href={cat.value ? `/?type=${cat.value}` : "/"}
+            className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
+              (typeFilter || "") === cat.value
+                ? "bg-red-600 text-white shadow-lg"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-red-600"
+            }`}
+          >
+            {cat.label}
+          </Link>
+        ))}
       </div>
 
-      {/* Hero Content */}
-      <h1 className="max-w-3xl text-5xl font-black leading-tight tracking-tighter text-gray-900 md:text-7xl">
-        Protect the <span className="text-red-600">IUBAT</span> Community.
-      </h1>
-      
-      <p className="mt-6 max-w-xl text-lg leading-relaxed text-gray-600 md:text-xl">
-        A transparent platform to report unethical activities and stay informed about safety incidents on campus. Your reports help everyone stay vigilant.
-      </p>
+      {/* Incident Feed Section */}
+      <section id="incidents" className="scroll-mt-24">
+        <div className="mb-8 flex items-center justify-between border-b border-gray-200 pb-4">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900">
+            Recent Incidents ({incidents.length})
+          </h2>
+        </div>
 
-      {/* Call to Actions */}
-      <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
-        <Link
-          href="/report"
-          className="w-full rounded-full bg-red-600 px-10 py-4 text-lg font-bold text-white transition-all hover:bg-red-700 active:scale-95 sm:w-auto"
-        >
-          File a Report
-        </Link>
-        <Link
-          href="#incidents"
-          className="w-full rounded-full border-2 border-gray-900 px-10 py-4 text-lg font-bold text-gray-900 transition-all hover:bg-gray-900 hover:text-white active:scale-95 sm:w-auto"
-        >
-          View Incidents
-        </Link>
-      </div>
-
-      {/* Simple Stats/Trust Section */}
-      <div className="mt-20 grid grid-cols-2 gap-8 border-t border-gray-200 pt-10 md:grid-cols-3">
-        <div className="flex flex-col">
-          <span className="text-3xl font-black text-gray-900">100%</span>
-          <span className="text-sm font-medium text-gray-500 uppercase">Anonymity</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-3xl font-black text-gray-900">Verified</span>
-          <span className="text-sm font-medium text-gray-500 uppercase">Evidence</span>
-        </div>
-        <div className="flex flex-col col-span-2 md:col-span-1">
-          <span className="text-3xl font-black text-gray-900">Fast</span>
-          <span className="text-sm font-medium text-gray-500 uppercase">Alerts</span>
-        </div>
-      </div>
+        {incidents.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {incidents.map((item: any) => (
+              <Link href={`/incident/${item._id}`} key={item._id}>
+                <IncidentCard incident={JSON.parse(JSON.stringify(item))} />
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center">
+            <p className="text-sm font-bold uppercase tracking-widest text-gray-400 italic">
+              No {typeFilter} incidents found.
+            </p>
+          </div>
+        )}
+      </section>
     </main>
   );
 }
