@@ -60,9 +60,10 @@ export default async function Home({ searchParams }: { searchParams: any }) {
         {incidents.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {incidents.map((item: any) => (
-              <Link href={`/incident/${item._id}`} key={item._id}>
-                <IncidentCard incident={JSON.parse(JSON.stringify(item))} />
-              </Link>
+              <IncidentCard 
+                key={item._id} 
+                incident={JSON.parse(JSON.stringify(item))} 
+              />
             ))}
           </div>
         ) : (
