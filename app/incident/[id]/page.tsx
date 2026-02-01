@@ -16,27 +16,36 @@ export default async function IncidentDetailsPage({ params }: { params: any }) {
         ← Back to Incident Feed
       </Link>
 
-      {/* EVIDENCE GALLERY SECTION */}
+      {/* EVIDENCE GALLERY SECTION (With Real Images) */}
       <section className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {/* Slot 1: Victim/Reporter */}
-        <div className="aspect-square rounded-3xl border border-gray-200 bg-white flex flex-col items-center justify-center p-6 shadow-sm">
-           <span className="mb-4 rounded-full bg-gray-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500">Victim / Reporter</span>
-           <div className="text-6xl">👤</div>
-           <p className="mt-4 text-xs font-bold text-gray-400 uppercase tracking-widest">No Image Provided</p>
+        {/* Victim Slot */}
+        <div className="relative aspect-square rounded-3xl border border-gray-200 bg-white overflow-hidden flex items-center justify-center shadow-sm">
+           {incident.victimImage ? (
+             <img src={incident.victimImage} className="h-full w-full object-cover" alt="Victim" />
+           ) : (
+             <div className="flex flex-col items-center"><span className="text-6xl mb-2 grayscale opacity-20">👤</span></div>
+           )}
+           <div className="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-[10px] font-black uppercase text-white">Victim</div>
         </div>
 
-        {/* Slot 2: The Item / Incident Scene */}
-        <div className="aspect-square rounded-3xl border border-gray-200 bg-white flex flex-col items-center justify-center p-6 shadow-sm">
-           <span className="mb-4 rounded-full bg-gray-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500">Evidence / Item</span>
-           <div className="text-6xl">📦</div>
-           <p className="mt-4 text-xs font-bold text-gray-400 uppercase tracking-widest">No Image Provided</p>
+        {/* Item Slot */}
+        <div className="relative aspect-square rounded-3xl border border-gray-200 bg-white overflow-hidden flex items-center justify-center shadow-sm">
+           {incident.itemImage ? (
+             <img src={incident.itemImage} className="h-full w-full object-cover" alt="Item" />
+           ) : (
+             <div className="flex flex-col items-center"><span className="text-6xl mb-2 grayscale opacity-20">📦</span></div>
+           )}
+           <div className="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-[10px] font-black uppercase text-white">Evidence / Item</div>
         </div>
 
-        {/* Slot 3: The Accused / Red Flag */}
-        <div className="aspect-square rounded-3xl border-2 border-dashed border-red-200 bg-red-50 flex flex-col items-center justify-center p-6 shadow-sm">
-           <span className="mb-4 rounded-full bg-red-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-red-600 italic underline decoration-red-600 underline-offset-4">Primary Red Flag</span>
-           <div className="text-6xl grayscale">❓</div>
-           <p className="mt-4 text-[10px] font-black text-red-400 uppercase tracking-widest text-center">Identifying Image Pending Verification</p>
+        {/* Accused Slot */}
+        <div className="relative aspect-square rounded-3xl border-2 border-dashed border-red-200 bg-red-50 overflow-hidden flex items-center justify-center shadow-sm">
+           {incident.accusedImage ? (
+             <img src={incident.accusedImage} className="h-full w-full object-cover" alt="Accused" />
+           ) : (
+             <div className="flex flex-col items-center"><span className="text-6xl mb-2">❓</span></div>
+           )}
+           <div className="absolute top-4 left-4 bg-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase text-white italic tracking-tighter">Primary Red Flag</div>
         </div>
       </section>
 
@@ -52,6 +61,7 @@ export default async function IncidentDetailsPage({ params }: { params: any }) {
             </h1>
           </div>
 
+          {/* Description */}
           <div className="rounded-3xl border border-gray-100 bg-white p-10 shadow-sm">
             <h2 className="text-[10px] font-black uppercase text-gray-400 mb-6 tracking-[0.2em] flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-red-600"></span> Detailed Context
@@ -67,36 +77,53 @@ export default async function IncidentDetailsPage({ params }: { params: any }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {incident.witnesses.map((w: string, i: number) => (
                 <div key={i} className="flex items-center gap-4 bg-white p-5 rounded-2xl border border-gray-100 font-black text-gray-900 uppercase italic tracking-tight shadow-sm">
-                   <div className="h-10 w-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center">W{i+1}</div> 
+                   <div className="h-10 w-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center italic">W{i+1}</div> 
                    {w}
                 </div>
               ))}
             </div>
           </div>
+          
+          {/* Multiple Evidence Links (The Missing Links Section) */}
+          <div className="rounded-3xl border border-gray-200 bg-white p-10">
+            <h2 className="text-[10px] font-black uppercase text-gray-400 mb-6 tracking-[0.2em]">External Evidence Links</h2>
+            <div className="space-y-3">
+              {incident.evidenceLinks && incident.evidenceLinks.length > 0 ? (
+                incident.evidenceLinks.map((link: string, i: number) => (
+                  <a key={i} href={link} target="_blank" className="flex items-center gap-3 p-5 rounded-2xl border border-gray-100 bg-gray-50 text-sm font-bold text-blue-600 transition-all hover:bg-red-50 hover:text-red-600 group">
+                    <span className="text-xl group-hover:scale-125 transition-transform">🔗</span> 
+                    <span className="break-all">{link}</span>
+                    <span className="ml-auto">↗</span>
+                  </a>
+                ))
+              ) : (
+                <p className="text-xs font-bold text-gray-400 italic">No external links provided.</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Sidebar Info */}
+        {/* Sidebar Log */}
         <aside className="space-y-6">
            <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
-              <h3 className="text-[10px] font-black uppercase text-gray-400 mb-6 tracking-widest border-b pb-4">Incident Logistics</h3>
+              <h3 className="text-[10px] font-black uppercase text-gray-400 mb-6 tracking-widest border-b pb-4">Logistics</h3>
               <div className="space-y-6">
                  <div>
-                    <p className="text-[9px] uppercase font-black text-gray-400 tracking-widest mb-1">Location</p>
-                    <p className="font-black text-gray-900 uppercase text-lg italic">{incident.location}</p>
+                    <p className="text-[9px] uppercase font-black text-gray-400 mb-1">Location</p>
+                    <p className="font-black text-gray-900 uppercase text-lg italic tracking-tight">{incident.location}</p>
                  </div>
                  <div>
-                    <p className="text-[9px] uppercase font-black text-gray-400 tracking-widest mb-1">Timeline</p>
-                    <p className="font-black text-gray-900 uppercase">{incident.date} / {incident.time}</p>
+                    <p className="text-[9px] uppercase font-black text-gray-400 mb-1">Timeline</p>
+                    <p className="font-black text-gray-900 uppercase tracking-tight">{incident.date} / {incident.time}</p>
                  </div>
+                 {incident.reportedPerson && (
+                    <div>
+                        <p className="text-[9px] uppercase font-black text-gray-400 mb-1">Alleged Person</p>
+                        <p className="font-black text-red-600 uppercase tracking-tight">{incident.reportedPerson}</p>
+                    </div>
+                 )}
               </div>
            </div>
-
-           {incident.evidenceLink && (
-              <a href={incident.evidenceLink} target="_blank" className="block w-full rounded-3xl bg-red-600 p-8 text-center text-white transition-all hover:bg-black active:scale-95 shadow-xl shadow-red-100">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2">Primary Link</p>
-                <p className="font-black uppercase tracking-tight text-xl italic">External Evidence ↗</p>
-              </a>
-           )}
         </aside>
       </div>
     </main>
