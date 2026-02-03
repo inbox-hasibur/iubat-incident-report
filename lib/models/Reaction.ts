@@ -10,7 +10,8 @@ const ReactionSchema = new Schema(
     ip: { type: String, required: true },
     type: { 
       type: String, 
-      enum: ["justice", "agree", "haha", "angry", "sad", "support"], 
+      // Removed 'agree' and 'support'
+      enum: ["justice", "haha", "angry", "sad"], 
       required: true 
     },
   },

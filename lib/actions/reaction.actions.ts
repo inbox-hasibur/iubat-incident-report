@@ -46,13 +46,11 @@ export async function getReactionCounts(incidentId: string) {
     
     return {
       justice: reactions.filter(r => r.type === "justice").length,
-      agree: reactions.filter(r => r.type === "agree").length,
       haha: reactions.filter(r => r.type === "haha").length,
       angry: reactions.filter(r => r.type === "angry").length,
       sad: reactions.filter(r => r.type === "sad").length,
-      support: reactions.filter(r => r.type === "support").length,
     };
   } catch (error) {
-    return { justice: 0, agree: 0, haha: 0, angry: 0, sad: 0, support: 0 };
+    return { justice: 0, haha: 0, angry: 0, sad: 0 };
   }
 }
